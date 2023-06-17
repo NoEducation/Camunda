@@ -12,11 +12,11 @@ pobieramy repozytorium i z uruchamiamy komendą: docker-compose up -d
 Należy także przestawić flage IsLocalConnection w appsettings na true.
 Zabice środowiska: docker compose down -v
 Adresy:
-	- Operate: http://localhost:8081
-	- Tasklist: http://localhost:8082
-	- Optimize: http://localhost:8083
-	- Identity: http://localhost:8084
-	- Elasticsearch: http://localhost:9200
+- Operate: http://localhost:8081
+- Tasklist: http://localhost:8082
+- Optimize: http://localhost:8083
+- Identity: http://localhost:8084
+- Elasticsearch: http://localhost:9200
 
 ---------------------------------
 Przydatne tutoriale:
