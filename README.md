@@ -8,9 +8,15 @@ oraz dodać do API Client credentials. Pobieramy Client credentials z zakładki 
 Uruchamianie środowiska lokalnie:
 
 https://github.com/camunda/camunda-platform
-pobieramy repozytorium i z uruchamiamy komendą: docker-compose up -d
+pobieramy repozytorium i z uruchamiamy komendą:
+```
+docker-compose up -d
+```
 Należy także przestawić flage IsLocalConnection w appsettings na true.
-Zabice środowiska: docker compose down -v
+Zabice środowiska: 
+```
+docker compose down -v
+```
 Adresy:
 - Operate: http://localhost:8081
 - Tasklist: http://localhost:8082
