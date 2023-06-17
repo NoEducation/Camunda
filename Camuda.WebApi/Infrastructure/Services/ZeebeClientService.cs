@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using Camunda.WebApi.Consts;
 using Camunda.WebApi.Options;
-using dotenv.net.Interfaces;
 using Microsoft.Extensions.Options;
 using Zeebe.Client;
 using Zeebe.Client.Api.Commands;
@@ -13,23 +12,19 @@ namespace Camunda.WebApi.Infrastructure.Services;
 
 public class ZeebeClientService : IZeebeClientService, IDisposable
 {
-    private const string ZEEBE_ADDRESS = "ZEEBE_ADDRESS";
-    private const string ZEEBE_AUTHORIZATION_SERVER_URL = "ZEEBE_AUTHORIZATION_SERVER_URL";
-    private const string ZEEBE_CLIENT_ID = "ZEEBE_CLIENT_ID";
-    private const string ZEEBE_CLIENT_SECRET = "ZEEBE_CLIENT_SECRET";
+    private readonly CamundaEnvironmentOptions _camundaEnvironment;
     private readonly CamundaOptions _camundaOptions;
 
     private readonly IZeebeClient _client;
-    private readonly IEnvReader _envReader;
     private readonly ILogger<ZeebeClientService> _logger;
 
     public ZeebeClientService(
-        IEnvReader envReader,
         ILogger<ZeebeClientService> logger,
-        IOptions<CamundaOptions> camundaOptions)
+        IOptions<CamundaOptions> camundaOptions,
+        IOptions<CamundaEnvironmentOptions> camundaEnvironment)
     {
-        _envReader = envReader;
         _logger = logger;
+        _camundaEnvironment = camundaEnvironment.Value;
         _camundaOptions = camundaOptions.Value;
         _client = GetClient();
     }
@@ -175,10 +170,8 @@ public class ZeebeClientService : IZeebeClientService, IDisposable
 
     private IZeebeClient GetLocalClient()
     {
-        var zeebeUrl = _envReader.GetStringValue(ZEEBE_ADDRESS);
-
         var builder = ZeebeClient.Builder()
-            .UseGatewayAddress(zeebeUrl)
+            .UseGatewayAddress(_camundaOptions.LocalConnectionAddress)
             .UsePlainText()
             .Build();
 
@@ -187,21 +180,18 @@ public class ZeebeClientService : IZeebeClientService, IDisposable
 
     private IZeebeClient GetCloudClient()
     {
-        var zeebeUrl = _envReader.GetStringValue(ZEEBE_ADDRESS);
+        var zeebeUrl = _camundaEnvironment.ZEEBE_ADDRESS;
         char[] port = { '4', '3', ':' };
         var audience = zeebeUrl?.TrimEnd(port);
-        var authServer = _envReader.GetStringValue(ZEEBE_AUTHORIZATION_SERVER_URL);
-        var clientId = _envReader.GetStringValue(ZEEBE_CLIENT_ID);
-        var clientSecret = _envReader.GetStringValue(ZEEBE_CLIENT_SECRET);
 
         return ZeebeClient.Builder()
             .UseGatewayAddress(zeebeUrl)
             .UseTransportEncryption()
             .UseAccessTokenSupplier(
                 CamundaCloudTokenProvider.Builder()
-                    .UseAuthServer(authServer)
-                    .UseClientId(clientId)
-                    .UseClientSecret(clientSecret)
+                    .UseAuthServer(_camundaEnvironment.ZEEBE_AUTHORIZATION_SERVER_URL)
+                    .UseClientId(_camundaEnvironment.ZEEBE_CLIENT_ID)
+                    .UseClientSecret(_camundaEnvironment.ZEEBE_CLIENT_SECRET)
                     .UseAudience(audience)
                     .Build())
             .Build();

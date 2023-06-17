@@ -4,6 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>49f80733-8cca-4681-8273-416db406d26e</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,19 +12,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="dotenv.net.DependencyInjection.Microsoft" Version="2.1.3" />
-    <PackageReference Include="fastJSON" Version="2.4.0.4" />
-    <PackageReference Include="MediatR" Version="12.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="zb-client" Version="1.3.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="CamundaLocal.env">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Resources\Forms\email_form.form">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
