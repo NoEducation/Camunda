@@ -1,17 +1,25 @@
-![Compatible with: Camunda Platform 8](https://img.shields.io/badge/Compatible%20with-Camunda%20Platform%208-0072Ce)
-# DotNet Guide to Camunda 8
-> This code was used in a blogpost. I recommend taking a look at the blogpost first before diving into this repository.
-> 
-> For the blogpost: [Click here!](https://camunda.com/blog/2022/11/camunda-platform-8-dotnet-developers/) 
+---------------------------------
+Uruchumoienie środowiska w chmurze/SASS:
 
-### Useful information
-- This project's target framework is **.Net Core 3.1**
-- We are using [zeebe-client-csharp](https://github.com/camunda-community-hub/zeebe-client-csharp) as nuget package in our camunda-8-access-layer project
-- You need to enroll for a C8 client to connect this client with Camunda 8. You can do so following [this link](https://accounts.cloud.camunda.io/signup). 
-- Make sure to **update** the **Camunda 8 secrets** hen running the project on your own. This needs to be done in the `ZeebeClient` class. 
+Przed uruchomieniem należy utworzyć klaster na https://console.cloud.camunda.io
+oraz dodać do API Client credentials. Pobieramy Client credentials z zakładki Env Vars i zapisujemy w pliku CamundaCloud.env usuwając słowa export.
 
-You can find these implementations in the project: 
-1. [Process diagram](./DotNet-Camunda8-getting-started/Resources) 
-2. [ZeebeClient implementation](./DotNet-Camunda8-getting-started/ZeebeClient.cs)
-3. [Blood alcohol approximator](./blood-alcohol-approximator/BloodAlcoholApproximator.cs)
-4. [Unit Tests](./test-bac-approximator/UnitTest.cs)
+---------------------------------
+Uruchumoienie środowiska lokalnie:
+
+https://github.com/camunda/camunda-platform
+pobieramy repozytorium i z uruchamiamy komendą: docker-compose up -d
+Należy także przestawić flage IsLocalConnection w appsettings na true.
+Zabice środowiska docker compose down -v
+Adresy:
+	Operate: http://localhost:8081
+	Tasklist: http://localhost:8082
+	Optimize: http://localhost:8083
+	Identity: http://localhost:8084
+	Elasticsearch: http://localhost:9200
+
+---------------------------------
+Przydatne tutoriale:
+https://unsupported.docs.camunda.io/0.26/docs/guides/setting-up-development-project/
+https://github.com/Hafflgav/camunda-8-dotnet-guide
+https://github.com/camunda/camunda-platform-get-started/tree/main/csharp
