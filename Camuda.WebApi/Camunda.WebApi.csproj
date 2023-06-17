@@ -24,9 +24,6 @@
     <None Update="CamundaLocal.env">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="CamundaCloud.env">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Resources\Forms\email_form.form">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
