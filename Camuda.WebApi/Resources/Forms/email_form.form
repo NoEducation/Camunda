@@ -1,0 +1,35 @@
+{
+  "components": [
+    {
+      "label": "Title",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0nwlrc5",
+        "columns": null
+      },
+      "id": "Field_0fg9gd9",
+      "key": "EmailTitle",
+      "defaultValue": "Test title"
+    },
+    {
+      "label": "Email body",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_13bsac0",
+        "columns": null
+      },
+      "id": "Field_0hqcnbu",
+      "key": "EmailBody",
+      "defaultValue": "Test body"
+    }
+  ],
+  "type": "default",
+  "id": "email_form",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.2.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.11.0"
+  },
+  "schemaVersion": 8
+}

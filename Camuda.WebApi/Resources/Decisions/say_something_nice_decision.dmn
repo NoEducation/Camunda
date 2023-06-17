@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="test_process_decision_diagram" name="Test process decision " namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="5.11.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.2.0">
+  <decision id="say_something_nice_decision" name="Say something nice decision">
+    <informationRequirement id="InformationRequirement_0fua5vp">
+      <requiredInput href="#Greeting" />
+    </informationRequirement>
+    <informationRequirement id="InformationRequirement_07pgvca">
+      <requiredInput href="#InputData_05ab5a7" />
+    </informationRequirement>
+    <decisionTable id="DecisionTable_03j7h1m">
+      <input id="Input_1">
+        <inputExpression id="InputExpression_1" typeRef="number">
+          <text>DayOfWeek</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0ku43bo">
+        <inputExpression id="LiteralExpression_1itmmir" typeRef="string">
+          <text>Greeting</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" name="DecisionResult" typeRef="string" />
+      <rule id="DecisionRule_0fgb6g6">
+        <inputEntry id="UnaryTests_0cse0ai">
+          <text>0</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1pbnqrh">
+          <text>"Good after noon"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_04jjf0e">
+          <text>"Blue sunday"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_15x3bhc">
+        <inputEntry id="UnaryTests_15qcvp0">
+          <text>0</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0r6r05p">
+          <text>"Good morning"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1fui85b">
+          <text>"Beginning of blue sunday"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1p8afgq">
+        <inputEntry id="UnaryTests_0sj39sd">
+          <text>1</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_09j6q7t">
+          <text>"Good after noon"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_15ucbzm">
+          <text>"It's hurt"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_05yp2kv">
+        <inputEntry id="UnaryTests_0df2hr4">
+          <text>1</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0qqknmn">
+          <text>"Good morning"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0s95gux">
+          <text>"It's beginning to hurt"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0zbbu9t">
+        <inputEntry id="UnaryTests_0m8x4dk">
+          <text>2</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_16p7e8k">
+          <text>"Good after noon"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_15548bp">
+          <text>"Still not good"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_18zux1y">
+        <inputEntry id="UnaryTests_0u1bzjw">
+          <text>2</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1qagtt0">
+          <text>"Good morning"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0fadox7">
+          <text>"Still not very good"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0auvfyd">
+        <inputEntry id="UnaryTests_1mvi32y">
+          <text>3</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_19ow4ab">
+          <text>"Good after noon"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1l33oey">
+          <text>"Sun start to shine"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1h3z5v0">
+        <inputEntry id="UnaryTests_0bfh63y">
+          <text>3</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0967aw7">
+          <text>"Good morning"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1jbniei">
+          <text>"Sun start to shine on the morning"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_009ndj3">
+        <inputEntry id="UnaryTests_0rryq09">
+          <text>4</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_01hbbiv">
+          <text>"Good after noon"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1rj70sl">
+          <text>"Is almost done"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0zqt34d">
+        <inputEntry id="UnaryTests_1wajhfy">
+          <text>4</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1uligv0">
+          <text>"Good morning"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_18fvtww">
+          <text>"Is almost done but still not good"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0q9n3v1">
+        <inputEntry id="UnaryTests_128dxnr">
+          <text>5</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1lseus8">
+          <text>"Good after noon"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1malbgq">
+          <text>"Yes you made it, it's friday !"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1kmd093">
+        <inputEntry id="UnaryTests_1dgjifj">
+          <text>5</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1oi817i">
+          <text>"Good morning"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0ufcht9">
+          <text>"Maybye you start"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_13epvil">
+        <inputEntry id="UnaryTests_077rdug">
+          <text>6</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0r0rp0s">
+          <text>"Good after noon"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_12jh7zx">
+          <text>"Saturday night !"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_17liyfp">
+        <inputEntry id="UnaryTests_1069qkc">
+          <text>6</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1bx7p8e">
+          <text>"Good morning"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1587bzf">
+          <text>"Saturday morning!"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <inputData id="Greeting" name="Greeting" />
+  <inputData id="InputData_05ab5a7" name="DayOfWeek" />
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="say_something_nice_decision">
+        <dc:Bounds height="80" width="180" x="240" y="260" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_0sz5bwb" dmnElementRef="Greeting">
+        <dc:Bounds height="45" width="125" x="157" y="77" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_1lcxfqu" dmnElementRef="InformationRequirement_0fua5vp">
+        <di:waypoint x="220" y="122" />
+        <di:waypoint x="300" y="240" />
+        <di:waypoint x="300" y="260" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNShape id="DMNShape_1mtzk7a" dmnElementRef="InputData_05ab5a7">
+        <dc:Bounds height="45" width="125" x="407" y="77" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_1ii6pk0" dmnElementRef="InformationRequirement_07pgvca">
+        <di:waypoint x="470" y="122" />
+        <di:waypoint x="360" y="240" />
+        <di:waypoint x="360" y="260" />
+      </dmndi:DMNEdge>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
