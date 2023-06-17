@@ -1,7 +1,6 @@
-﻿namespace Camuda.WebApi.Dtos
+﻿namespace Camunda.WebApi.Dtos;
+
+public class MakeGreetingCustomHeadersDto
 {
-    public class MakeGreetingCustomHeadersDto
-    {
-        public string Greeting { get; set; } = default!;
-    }
+    public string Greeting { get; set; } = default!;
 }

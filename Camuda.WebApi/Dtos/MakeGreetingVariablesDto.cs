@@ -1,12 +1,11 @@
-﻿namespace Camuda.WebApi.Dtos
-{
-    public class MakeGreetingVariablesDto
-    {
-        public string Name { get; set; } = default!;
+﻿namespace Camunda.WebApi.Dtos;
 
-        public MakeGreetingVariablesDto(string name)
-        {
-            Name = name;
-        }
+public class MakeGreetingVariablesDto
+{
+    public MakeGreetingVariablesDto(string name)
+    {
+        Name = name;
     }
+
+    public string Name { get; set; } = default!;
 }

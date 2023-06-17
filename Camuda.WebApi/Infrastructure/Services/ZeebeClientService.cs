@@ -1,200 +1,206 @@
-﻿using Camuda.WebApi.Consts;
-using Camuda.WebApi.Options;
+﻿using System.Text.Json;
+using Camunda.WebApi.Consts;
+using Camunda.WebApi.Options;
 using dotenv.net.Interfaces;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
 using Zeebe.Client;
 using Zeebe.Client.Api.Commands;
 using Zeebe.Client.Api.Responses;
 using Zeebe.Client.Api.Worker;
 using Zeebe.Client.Impl.Builder;
 
-namespace Camuda.WebApi.Infrastructure.Services
+namespace Camunda.WebApi.Infrastructure.Services;
+
+public class ZeebeClientService : IZeebeClientService, IDisposable
 {
-    public class ZeebeClientService : IZeebeClientService, IDisposable
+    private const string ZEEBE_ADDRESS = "ZEEBE_ADDRESS";
+    private const string ZEEBE_AUTHORIZATION_SERVER_URL = "ZEEBE_AUTHORIZATION_SERVER_URL";
+    private const string ZEEBE_CLIENT_ID = "ZEEBE_CLIENT_ID";
+    private const string ZEEBE_CLIENT_SECRET = "ZEEBE_CLIENT_SECRET";
+    private readonly CamundaOptions _camundaOptions;
+
+    private readonly IZeebeClient _client;
+    private readonly IEnvReader _envReader;
+    private readonly ILogger<ZeebeClientService> _logger;
+
+    public ZeebeClientService(
+        IEnvReader envReader,
+        ILogger<ZeebeClientService> logger,
+        IOptions<CamundaOptions> camundaOptions)
     {
-        private const string ZEEBE_ADDRESS = "ZEEBE_ADDRESS";
-        private const string ZEEBE_AUTHORIZATION_SERVER_URL = "ZEEBE_AUTHORIZATION_SERVER_URL";
-        private const string ZEEBE_CLIENT_ID = "ZEEBE_CLIENT_ID";
-        private const string ZEEBE_CLIENT_SECRET = "ZEEBE_CLIENT_SECRET";
+        _envReader = envReader;
+        _logger = logger;
+        _camundaOptions = camundaOptions.Value;
+        _client = GetClient();
+    }
 
-        private readonly IZeebeClient _client;
-        private readonly IEnvReader _envReader;
-        private readonly ComundaOptions _comundaOptions;
-        private readonly ILogger<ZeebeClientService> _logger;
+    public void Dispose()
+    {
+        _client?.Dispose();
+    }
 
-        public ZeebeClientService(
-            IEnvReader envReader,
-            ILogger<ZeebeClientService> logger,
-            IOptions<ComundaOptions> comundaOptions)
+    public Task<ITopology> Status(CancellationToken cancellationToken)
+    {
+        return _client.TopologyRequest().Send(cancellationToken);
+    }
+
+    public async Task DeployAll(CancellationToken cancellationToken)
+    {
+        var builder = GetDeployBuilder();
+
+        if (builder == default)
+            return;
+
+        var deployment = await builder.Send(cancellationToken);
+
+        foreach (var process in deployment.Processes)
+            _logger.LogInformation("Deployed BPMN Model: " + process!.BpmnProcessId + " v." + process!.Version +
+                                   " process name: " + process!.ResourceName);
+    }
+
+    public async Task<IProcessInstanceResult> RunProcessInstance(string bpmProcessId,
+        CancellationToken cancellationToken, object? payload = null)
+    {
+        var processCommandBuilder = GetProcessInstanceBuilder(bpmProcessId, payload);
+
+        try
         {
-            _envReader = envReader;
-            _logger = logger;
-            _comundaOptions = comundaOptions.Value;
-            _client = GetClient();
+            var instance = await processCommandBuilder.WithResult()
+                .Send(TimeSpan.FromMinutes(_camundaOptions.ProcessInstanceRunTimeout), cancellationToken);
+
+            return instance;
         }
-
-        public Task<ITopology> Status(CancellationToken cancellationToken) 
-            => _client.TopologyRequest().Send(cancellationToken);
-
-        public async Task DeployAll(CancellationToken cancellationToken)
+        catch (Exception ex)
         {
-            var builder = GetDeployBuilder();
-
-            if (builder == default)
-                return;
-
-            var deployment = await builder.Send(cancellationToken);
-
-            foreach (var process in deployment.Processes)
-                _logger.LogInformation("Deployed BPMN Model: " + process!.BpmnProcessId + " v." + process!.Version + " process name: " + process!.ResourceName);
+            _logger.LogError($"Error occured during running process id {bpmProcessId}, " +
+                             $"with payload: {JsonSerializer.Serialize(payload)}, ex: {ex}");
+            throw;
         }
+    }
 
-        public async Task<IProcessInstanceResult> RunProcessInstance(string bpmProcessId, 
-            CancellationToken cancellationToken, object? payload = null)
+    public async Task<IProcessInstanceResponse> CreateProcessInstance(string bpmProcessId,
+        CancellationToken cancellationToken, object? payload = null)
+    {
+        var processCommandBuilder = GetProcessInstanceBuilder(bpmProcessId, payload);
+
+        try
         {
-            var processCommandBuilder = GetProcessInstanceBuilder(bpmProcessId, payload);
+            var instanceCreatedResult = await processCommandBuilder
+                .Send(TimeSpan.FromSeconds(_camundaOptions.ProcessInstanceRunTimeout), cancellationToken);
 
-            try
-            {
-                var instance = await processCommandBuilder.WithResult()
-                    .Send(TimeSpan.FromMinutes(_comundaOptions.ProcessInstanceRunTimeout), cancellationToken);
-
-                return instance;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occured during running process id {bpmProcessId}, " +
-                    $"with payload: {JsonSerializer.Serialize(payload)}, ex: {ex}");
-                throw;
-            }
+            return instanceCreatedResult;
         }
-
-        public async Task<IProcessInstanceResponse> CreateProcessInstance(string bpmProcessId,
-            CancellationToken cancellationToken, object? payload = null)
+        catch (Exception ex)
         {
-            var processCommandBuilder = GetProcessInstanceBuilder(bpmProcessId, payload);
-
-            try
-            {
-                var instanceCreatedResult = await processCommandBuilder
-                    .Send(TimeSpan.FromSeconds(_comundaOptions.ProcessInstanceRunTimeout), cancellationToken);
-
-                return instanceCreatedResult;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occured during creating process id {bpmProcessId}, " +
-                    $"with payload: {JsonSerializer.Serialize(payload)}, ex: {ex}");
-                throw;
-            }
+            _logger.LogError($"Error occured during creating process id {bpmProcessId}, " +
+                             $"with payload: {JsonSerializer.Serialize(payload)}, ex: {ex}");
+            throw;
         }
+    }
 
-        public IJobWorker CreateWorker(string jobType, JobHandler handleJob, params string[]? fetchVariables)
-        {
-            var worker = _client.NewWorker()
-                    .JobType(jobType)
-                    .Handler(handleJob)
-                    .MaxJobsActive(_comundaOptions.MaxJobsActive)
-                    .Name(jobType)
-                    .PollInterval(TimeSpan.FromSeconds(_comundaOptions.JobsPollInterval))
-                    .PollingTimeout(TimeSpan.FromSeconds(_comundaOptions.JobsPollingTimeout))
-                    .Timeout(TimeSpan.FromSeconds(_comundaOptions.JobsTimeout))
-                    .FetchVariables(fetchVariables)
-                    .Open();
+    public IJobWorker CreateWorker(string jobType, AsyncJobHandler handleJob, params string[]? fetchVariables)
+    {
+        var worker = _client.NewWorker()
+            .JobType(jobType)
+            .Handler(handleJob)
+            .MaxJobsActive(_camundaOptions.MaxJobsActive)
+            .Name(jobType)
+            .PollInterval(TimeSpan.FromSeconds(_camundaOptions.JobsPollInterval))
+            .PollingTimeout(TimeSpan.FromSeconds(_camundaOptions.JobsPollingTimeout))
+            .Timeout(TimeSpan.FromSeconds(_camundaOptions.JobsTimeout))
+            .FetchVariables(fetchVariables)
+            .Open();
 
-            return worker;
-        }
+        return worker;
+    }
 
-        public async Task SendMessage(string messageName, string correlationKey, 
-            object payload, CancellationToken cancellationToken)
-        {
-            await _client.NewPublishMessageCommand()
-                .MessageName(messageName)
-                .CorrelationKey(correlationKey)
-                .Variables(JsonSerializer.Serialize(payload))
-                .Send(cancellationToken);
-        }
+    public async Task SendMessage(string messageName, string correlationKey,
+        object payload, CancellationToken cancellationToken)
+    {
+        await _client.NewPublishMessageCommand()
+            .MessageName(messageName)
+            .CorrelationKey(correlationKey)
+            .Variables(JsonSerializer.Serialize(payload))
+            .Send(cancellationToken);
+    }
 
-        private string GetProcessPath(string processName)
-            => Path.Combine(AppDomain.CurrentDomain.BaseDirectory!, "Resources", processName + ".bpmn");
+    private string GetProcessPath(string processName)
+    {
+        return Path.Combine(AppDomain.CurrentDomain.BaseDirectory!, "Resources", processName + ".bpmn");
+    }
 
-        private string GetDecisionPath(string decisionName)
-             => Path.Combine(AppDomain.CurrentDomain.BaseDirectory!, "Resources\\Decisions", decisionName + ".dmn");
+    private string GetDecisionPath(string decisionName)
+    {
+        return Path.Combine(AppDomain.CurrentDomain.BaseDirectory!, "Resources\\Decisions", decisionName + ".dmn");
+    }
 
-        private IDeployProcessCommandBuilderStep2? GetDeployBuilder()
-        {
-            IDeployProcessCommandStep1? builder = _client.NewDeployCommand();
+    private IDeployProcessCommandBuilderStep2? GetDeployBuilder()
+    {
+        var builder = _client.NewDeployCommand();
 
-            IDeployProcessCommandBuilderStep2 builderStep = default!;
+        IDeployProcessCommandBuilderStep2 builderStep = default!;
 
-            foreach (var processName in ComundaProcessesNames.All)
-                builderStep = builder
-                    .AddResourceFile(GetProcessPath(processName));
+        foreach (var processName in CamundaProcessesNames.All)
+            builderStep = builder
+                .AddResourceFile(GetProcessPath(processName));
 
-            foreach (var decisionName in ComundaDecisionsNames.All)
-                builderStep = builder
-                    .AddResourceFile(GetDecisionPath(decisionName));
+        foreach (var decisionName in CamundaDecisionsNames.All)
+            builderStep = builder
+                .AddResourceFile(GetDecisionPath(decisionName));
 
-            return builderStep;
-        }
+        return builderStep;
+    }
 
-        private ICreateProcessInstanceCommandStep3 GetProcessInstanceBuilder(string bpmProcessId, object? payload = null)
-        {
-            var processCommandBuilder = _client
-                 .NewCreateProcessInstanceCommand()
-                 .BpmnProcessId(bpmProcessId)
-                 .LatestVersion();
+    private ICreateProcessInstanceCommandStep3 GetProcessInstanceBuilder(string bpmProcessId, object? payload = null)
+    {
+        var processCommandBuilder = _client
+            .NewCreateProcessInstanceCommand()
+            .BpmnProcessId(bpmProcessId)
+            .LatestVersion();
 
-            if (payload is not null)
-                processCommandBuilder = processCommandBuilder
-                    .Variables(JsonSerializer.Serialize(payload));
+        if (payload is not null)
+            processCommandBuilder = processCommandBuilder
+                .Variables(JsonSerializer.Serialize(payload));
 
-            return processCommandBuilder;
-        }
+        return processCommandBuilder;
+    }
 
-        private IZeebeClient GetClient() => _comundaOptions.IsLocalConnection ? GetLocalClient() : GetCloudClient();
+    private IZeebeClient GetClient()
+    {
+        return _camundaOptions.IsLocalConnection ? GetLocalClient() : GetCloudClient();
+    }
 
-        private IZeebeClient GetLocalClient()
-        {
-            var zeebeUrl = _envReader.GetStringValue(ZEEBE_ADDRESS);
+    private IZeebeClient GetLocalClient()
+    {
+        var zeebeUrl = _envReader.GetStringValue(ZEEBE_ADDRESS);
 
-            var builder = ZeebeClient.Builder()
-                    .UseGatewayAddress(zeebeUrl)
-                    .UsePlainText()
-                    .Build();
+        var builder = ZeebeClient.Builder()
+            .UseGatewayAddress(zeebeUrl)
+            .UsePlainText()
+            .Build();
 
-            return builder;
-        }
+        return builder;
+    }
 
-        private IZeebeClient GetCloudClient()
-        {
-            var zeebeUrl = _envReader.GetStringValue(ZEEBE_ADDRESS);
-            char[] port = { '4', '3', ':' };
-            var audience = zeebeUrl?.TrimEnd(port);
-            var authServer = _envReader.GetStringValue(ZEEBE_AUTHORIZATION_SERVER_URL);
-            var clientId = _envReader.GetStringValue(ZEEBE_CLIENT_ID);
-            var clientSecret = _envReader.GetStringValue(ZEEBE_CLIENT_SECRET);
+    private IZeebeClient GetCloudClient()
+    {
+        var zeebeUrl = _envReader.GetStringValue(ZEEBE_ADDRESS);
+        char[] port = { '4', '3', ':' };
+        var audience = zeebeUrl?.TrimEnd(port);
+        var authServer = _envReader.GetStringValue(ZEEBE_AUTHORIZATION_SERVER_URL);
+        var clientId = _envReader.GetStringValue(ZEEBE_CLIENT_ID);
+        var clientSecret = _envReader.GetStringValue(ZEEBE_CLIENT_SECRET);
 
-            return ZeebeClient.Builder()
-                    .UseGatewayAddress(zeebeUrl)
-                    .UseTransportEncryption()
-                    .UseAccessTokenSupplier(
-                         CamundaCloudTokenProvider.Builder()
-                        .UseAuthServer(authServer)
-                        .UseClientId(clientId)
-                        .UseClientSecret(clientSecret)
-                        .UseAudience(audience)
-                        .Build())
-                    .Build();
-        }
-
-        public void Dispose()
-        {
-            if(_client is not null)
-            {
-                _client.Dispose();
-            }
-        }
+        return ZeebeClient.Builder()
+            .UseGatewayAddress(zeebeUrl)
+            .UseTransportEncryption()
+            .UseAccessTokenSupplier(
+                CamundaCloudTokenProvider.Builder()
+                    .UseAuthServer(authServer)
+                    .UseClientId(clientId)
+                    .UseClientSecret(clientSecret)
+                    .UseAudience(audience)
+                    .Build())
+            .Build();
     }
 }

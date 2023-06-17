@@ -1,43 +1,41 @@
-﻿using Camuda.WebApi.Consts;
-using Camuda.WebApi.Dtos;
-using Camuda.WebApi.Infrastructure.Services;
-using System.Text.Json;
+﻿using System.Text.Json;
+using Camunda.WebApi.Consts;
+using Camunda.WebApi.Dtos;
+using Camunda.WebApi.Infrastructure.Services;
 using Zeebe.Client.Api.Responses;
 using Zeebe.Client.Api.Worker;
 
-namespace Camuda.WebApi.Infrastructure.BackgroundServices
+namespace Camunda.WebApi.Infrastructure.BackgroundServices;
+
+public class GetTimeJobBackgroundService : BackgroundService
 {
-    public class GetTimeJobBackgroundService : BackgroundService
+    private readonly ILogger<GetTimeJobBackgroundService> _logger;
+    private readonly IZeebeClientService _zeebeClientService;
+
+    public GetTimeJobBackgroundService(IZeebeClientService zeebeClientService,
+        ILogger<GetTimeJobBackgroundService> logger)
     {
-        private readonly IZeebeClientService _zeebeClientService;
-        private readonly ILogger<GetTimeJobBackgroundService> _logger;
+        _zeebeClientService = zeebeClientService;
+        _logger = logger;
+    }
 
-        public GetTimeJobBackgroundService(IZeebeClientService zeebeClientService,
-            ILogger<GetTimeJobBackgroundService> logger)
-        {
-            _zeebeClientService = zeebeClientService;
-            _logger = logger;
-        }
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        _zeebeClientService.CreateWorker(TestProcessServiceTasksNames.GetTime, HandleJob);
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            _zeebeClientService.CreateWorker(TestProcessServiceTasksNames.GetTime,
-               async (client, job) => await HandleJob(client, job));
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
+    private async Task HandleJob(IJobClient client, IJob job)
+    {
+        _logger.LogInformation($"Received get time job for instance: {job.ElementInstanceKey}");
 
-        private async Task HandleJob(IJobClient client, IJob job)
-        {
-            _logger.LogInformation($"Received get time job for instance: {job.ElementInstanceKey}");
+        var currentTime = DateTimeOffset.UtcNow;
 
-            var currentTime = DateTimeOffset.UtcNow;
+        await client.NewCompleteJobCommand(job.Key)
+            .Variables(JsonSerializer.Serialize(new GetDateResultDto(currentTime)))
+            .Send();
 
-            await client.NewCompleteJobCommand(job.Key)
-                .Variables(JsonSerializer.Serialize(new GetDateResultDto(currentTime)))
-                .Send();
-
-            _logger.LogInformation($"Get time job completed job, for instance: {job.ElementInstanceKey}");
-        }
+        _logger.LogInformation($"Get time job completed job, for instance: {job.ElementInstanceKey}");
     }
 }

@@ -1,29 +1,28 @@
-﻿using Camuda.WebApi.Infrastructure.Services;
+﻿using Camunda.WebApi.Infrastructure.Services;
 
-namespace Camuda.WebApi.Infrastructure.HostedServices
+namespace Camunda.WebApi.Infrastructure.HostedServices;
+
+public class DeployResourcesHostedService : IHostedService
 {
-    public class DeployResourcesHostedService : IHostedService
+    private readonly CancellationToken _cancellationToken = new();
+    private readonly IZeebeClientService _zeebeClientService;
+
+    public DeployResourcesHostedService(IZeebeClientService zeebeClientService)
     {
-        private readonly IZeebeClientService _zeebeClientService;
-        private readonly CancellationToken _cancellationToken = new CancellationToken();
+        _zeebeClientService = zeebeClientService;
+    }
 
-        public DeployResourcesHostedService(IZeebeClientService zeebeClientService)
-        {
-            _zeebeClientService = zeebeClientService;
-        }
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested)
+            return;
 
-        public async Task StartAsync(CancellationToken cancellationToken)
-        {
-            if (cancellationToken.IsCancellationRequested)
-                return;
+        await _zeebeClientService.DeployAll(_cancellationToken);
+    }
 
-            await _zeebeClientService.DeployAll(_cancellationToken);
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _cancellationToken.ThrowIfCancellationRequested();
-            return Task.CompletedTask;
-        }
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _cancellationToken.ThrowIfCancellationRequested();
+        return Task.CompletedTask;
     }
 }

@@ -1,7 +1,6 @@
-﻿namespace Camuda.WebApi.Consts
+﻿namespace Camunda.WebApi.Consts;
+
+public class MessagesNames
 {
-    public class MessagesNames
-    {
-        public const string EmailSendMessage = "EmailSendMessage";
-    }
+    public const string EmailSendMessage = "EmailSendMessage";
 }

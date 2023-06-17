@@ -1,7 +1,6 @@
-﻿namespace Camuda.WebApi.Consts
+﻿namespace Camunda.WebApi.Consts;
+
+public class SendEmailServiceTaskNames
 {
-    public class SendEmailServiceTaskNames
-    {
-        public const string SendEmail = "send_email";
-    }
+    public const string SendEmail = "send_email";
 }

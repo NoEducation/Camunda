@@ -1,14 +1,13 @@
-﻿namespace Camuda.WebApi.Dtos
-{
-    public class MakeGreetingResultDto
-    {
-        public string Greeting { get; private set; } 
-        public string Name { get; private set; }
+﻿namespace Camunda.WebApi.Dtos;
 
-        public MakeGreetingResultDto(string greeting, string name)
-        {
-            Greeting = greeting;
-            Name = name;
-        }
+public class MakeGreetingResultDto
+{
+    public MakeGreetingResultDto(string greeting, string name)
+    {
+        Greeting = greeting;
+        Name = name;
     }
+
+    public string Greeting { get; }
+    public string Name { get; }
 }

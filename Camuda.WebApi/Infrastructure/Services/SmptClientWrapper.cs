@@ -1,34 +1,33 @@
-﻿using System.Net.Mail;
-using System.Net;
+﻿using System.Net;
+using System.Net.Mail;
+using Camunda.WebApi.Options;
 using Microsoft.Extensions.Options;
-using Camuda.WebApi.Options;
 
-namespace Camuda.WebApi.Infrastructure.Services
+namespace Camunda.WebApi.Infrastructure.Services;
+
+public class SmtpClientWrapper
 {
-    public class SmtpClientWrapper 
+    private readonly EmailOptions _emailOptions;
+
+    public SmtpClientWrapper(IOptions<EmailOptions> emailOptions)
     {
-        private readonly EmailOptions emailOptions;
+        _emailOptions = emailOptions.Value;
+    }
 
-        public SmtpClientWrapper(IOptions<EmailOptions> emailOptions)
+    public void Send(MailMessage mailMessage)
+    {
+        mailMessage.To.Add(_emailOptions.To);
+
+        var client = new SmtpClient
         {
-            this.emailOptions = emailOptions.Value;
-        }
+            Host = _emailOptions.Host,
+            Port = _emailOptions.Port,
+            EnableSsl = _emailOptions.EnableSsl,
+            DeliveryMethod = SmtpDeliveryMethod.Network,
+            UseDefaultCredentials = false,
+            Credentials = new NetworkCredential(_emailOptions.From, _emailOptions.Password)
+        };
 
-        public void Send(MailMessage mailMessage)
-        {
-            mailMessage.To.Add(emailOptions.To);
-
-            var client = new SmtpClient
-            {
-                Host = emailOptions.Host,
-                Port = emailOptions.Port,
-                EnableSsl = emailOptions.EnableSsl,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(emailOptions.From, emailOptions.Password),
-            };
-
-            client.Send(mailMessage);
-        }
+        client.Send(mailMessage);
     }
 }

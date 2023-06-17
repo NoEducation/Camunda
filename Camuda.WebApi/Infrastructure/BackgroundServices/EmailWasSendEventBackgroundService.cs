@@ -1,39 +1,36 @@
-﻿using Camuda.WebApi.Consts;
-using Camuda.WebApi.Infrastructure.Services;
-using Newtonsoft.Json;
+﻿using Camunda.WebApi.Consts;
+using Camunda.WebApi.Infrastructure.Services;
 using Zeebe.Client.Api.Responses;
 using Zeebe.Client.Api.Worker;
 
-namespace Camuda.WebApi.Infrastructure.BackgroundServices
+namespace Camunda.WebApi.Infrastructure.BackgroundServices;
+
+public class EmailWasSendEventBackgroundService : BackgroundService
 {
-    public class EmailWasSendEventBackgroundService : BackgroundService
+    private readonly ILogger<EmailWasSendEventBackgroundService> _logger;
+    private readonly IZeebeClientService _zeebeClientService;
+
+    public EmailWasSendEventBackgroundService(IZeebeClientService zeebeClientService,
+        ILogger<EmailWasSendEventBackgroundService> logger)
     {
-        private readonly IZeebeClientService _zeebeClientService;
-        private readonly ILogger<EmailWasSendEventBackgroundService> _logger;
+        _zeebeClientService = zeebeClientService;
+        _logger = logger;
+    }
 
-        public EmailWasSendEventBackgroundService(IZeebeClientService zeebeClientService,
-            ILogger<EmailWasSendEventBackgroundService> logger)
-        {
-            _zeebeClientService = zeebeClientService;
-            _logger = logger;
-        }
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        _zeebeClientService.CreateWorker(EmailIsSendTaskNames.EmailWasSend, HandleJob);
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            _zeebeClientService.CreateWorker(EmailIsSendTaskNames.EmailWasSend,
-             async (client, job) => await HandleJob(client, job));
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
+    private async Task HandleJob(IJobClient client, IJob job)
+    {
+        _logger.LogInformation($"Received email was send job for instance: {job.ElementInstanceKey}");
 
-        private async Task HandleJob(IJobClient client, IJob job)
-        {
-            _logger.LogInformation($"Received email was send job for instance: {job.ElementInstanceKey}");
+        await client.NewCompleteJobCommand(job.Key)
+            .Send();
 
-            await client.NewCompleteJobCommand(job.Key)
-                .Send();
-
-            _logger.LogInformation($"Send email was send completed job, for instance: {job.ElementInstanceKey}");
-        }
+        _logger.LogInformation($"Send email was send completed job, for instance: {job.ElementInstanceKey}");
     }
 }

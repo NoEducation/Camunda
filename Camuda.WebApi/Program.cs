@@ -1,21 +1,23 @@
-using Camuda.WebApi.Infrastructure.BackgroundServices;
-using Camuda.WebApi.Infrastructure.HostedServices;
-using Camuda.WebApi.Infrastructure.Services;
-using Camuda.WebApi.Options;
-using dotenv.net.DependencyInjection.Microsoft;
 using System.Text;
+using Camunda.WebApi.Infrastructure.BackgroundServices;
+using Camunda.WebApi.Infrastructure.HostedServices;
+using Camunda.WebApi.Infrastructure.Services;
+using Camunda.WebApi.Options;
+using dotenv.net.DependencyInjection.Microsoft;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEnv(builderEnv => {
+builder.Services.AddEnv(builderEnv =>
+{
     builderEnv
         .AddEnvFile(builder.Configuration
             .GetValue<bool>("Comunda:IsLocalConnection")
-            ? "CamundaLocal.env" 
+            ? "CamundaLocal.env"
             : "CamundaCloud.env")
         .AddThrowOnError(false)
         .AddEncoding(Encoding.ASCII);
 });
+
 builder.Services.AddEnvReader();
 
 builder.Services.AddControllers();
@@ -26,8 +28,8 @@ builder.Services.AddOptions();
 builder.Services.Configure<EmailOptions>(options =>
     builder.Configuration.GetSection(EmailOptions.Key).Bind(options));
 
-builder.Services.Configure<ComundaOptions>(options =>
-    builder.Configuration.GetSection(ComundaOptions.Key).Bind(options));
+builder.Services.Configure<CamundaOptions>(options =>
+    builder.Configuration.GetSection(CamundaOptions.Key).Bind(options));
 
 builder.Services.AddSingleton<IZeebeClientService, ZeebeClientService>();
 builder.Services.AddSingleton<EmailService>();
