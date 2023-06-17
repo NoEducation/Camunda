@@ -49,7 +49,10 @@ public class ZeebeClientService : IZeebeClientService, IDisposable
         var builder = GetDeployBuilder();
 
         if (builder == default)
+        {
+            _logger.LogInformation("No resources to deploy found");
             return;
+        }
 
         var deployment = await builder.Send(cancellationToken);
 
