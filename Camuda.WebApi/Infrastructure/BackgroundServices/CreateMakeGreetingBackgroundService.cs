@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Camunda.WebApi.Consts;
 using Camunda.WebApi.Dtos;
-using Camunda.WebApi.Infrastructure.Services;
+using Camunda.WebApi.Infrastructure.Services.ZeebeEngine;
 using Zeebe.Client.Api.Responses;
 using Zeebe.Client.Api.Worker;
 

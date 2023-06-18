@@ -1,5 +1,5 @@
 ﻿using Camunda.WebApi.Consts;
-using Camunda.WebApi.Infrastructure.Services;
+using Camunda.WebApi.Infrastructure.Services.ZeebeEngine;
 using Zeebe.Client.Api.Responses;
 using Zeebe.Client.Api.Worker;
 
@@ -10,11 +10,12 @@ public class EmailWasSendEventBackgroundService : BackgroundService
     private readonly ILogger<EmailWasSendEventBackgroundService> _logger;
     private readonly IZeebeClientService _zeebeClientService;
 
-    public EmailWasSendEventBackgroundService(IZeebeClientService zeebeClientService,
-        ILogger<EmailWasSendEventBackgroundService> logger)
+    public EmailWasSendEventBackgroundService(
+        ILogger<EmailWasSendEventBackgroundService> logger,
+        IZeebeClientService zeebeClientService)
     {
-        _zeebeClientService = zeebeClientService;
         _logger = logger;
+        _zeebeClientService = zeebeClientService;
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)

@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Camunda.WebApi.Consts;
 using Camunda.WebApi.Dtos;
-using Camunda.WebApi.Infrastructure.Services;
+using Camunda.WebApi.Infrastructure.Services.ZeebeEngine;
 using Zeebe.Client.Api.Responses;
 using Zeebe.Client.Api.Worker;
 
@@ -12,11 +12,11 @@ public class GetTimeJobBackgroundService : BackgroundService
     private readonly ILogger<GetTimeJobBackgroundService> _logger;
     private readonly IZeebeClientService _zeebeClientService;
 
-    public GetTimeJobBackgroundService(IZeebeClientService zeebeClientService,
-        ILogger<GetTimeJobBackgroundService> logger)
+    public GetTimeJobBackgroundService(ILogger<GetTimeJobBackgroundService> logger,
+        IZeebeClientService zeebeClientService)
     {
-        _zeebeClientService = zeebeClientService;
         _logger = logger;
+        _zeebeClientService = zeebeClientService;
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)

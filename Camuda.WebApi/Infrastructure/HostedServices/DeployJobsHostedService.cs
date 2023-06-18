@@ -1,4 +1,4 @@
-﻿using Camunda.WebApi.Infrastructure.Services;
+﻿using Camunda.WebApi.Infrastructure.Services.ZeebeEngine;
 
 namespace Camunda.WebApi.Infrastructure.HostedServices;
 
@@ -7,7 +7,8 @@ public class DeployResourcesHostedService : IHostedService
     private readonly CancellationToken _cancellationToken = new();
     private readonly IZeebeClientService _zeebeClientService;
 
-    public DeployResourcesHostedService(IZeebeClientService zeebeClientService)
+    public DeployResourcesHostedService(
+        IZeebeClientService zeebeClientService)
     {
         _zeebeClientService = zeebeClientService;
     }

@@ -3,7 +3,7 @@ using System.Net.Mail;
 using Camunda.WebApi.Options;
 using Microsoft.Extensions.Options;
 
-namespace Camunda.WebApi.Infrastructure.Services;
+namespace Camunda.WebApi.Infrastructure.Services.Email;
 
 public class SmtpClientWrapper
 {

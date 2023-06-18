@@ -12,5 +12,8 @@ public class CamundaEnvironmentOptions
     public string CAMUNDA_CLUSTER_ID { get; set; } = default!;
     public string CAMUNDA_CLUSTER_REGION { get; set; } = default!;
     public string CAMUNDA_CREDENTIALS_SCOPES { get; set; } = default!;
+    public string CAMUNDA_TASKLIST_BASE_URL { get; set; } = default!;
+    public string CAMUNDA_OPTIMIZE_BASE_URL { get; set; } = default!;
+    public string CAMUNDA_OPERATE_BASE_URL { get; set; } = default!;
     public string CAMUNDA_OAUTH_URL { get; set; } = default!;
 }

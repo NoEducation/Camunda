@@ -8,7 +8,7 @@ using Zeebe.Client.Api.Responses;
 using Zeebe.Client.Api.Worker;
 using Zeebe.Client.Impl.Builder;
 
-namespace Camunda.WebApi.Infrastructure.Services;
+namespace Camunda.WebApi.Infrastructure.Services.ZeebeEngine;
 
 public class ZeebeClientService : IZeebeClientService, IDisposable
 {
