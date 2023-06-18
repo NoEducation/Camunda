@@ -6,14 +6,17 @@ oraz dodać do API Client credentials wybierjąc wszysktie scopes. Pobieramy Cli
 CamundaEnvironment odpowiednimi wartościami w pliku appsettings.json
 ``` 
 "CamundaEnvironment": {
-    "ZEEBE_ADDRESS": "***",
-    "ZEEBE_CLIENT_ID": "***",
-    "ZEEBE_CLIENT_SECRET": "***",
+    "ZEEBE_ADDRESS": "*",
+    "ZEEBE_CLIENT_ID": "*",
+    "ZEEBE_CLIENT_SECRET": "*",
     "ZEEBE_AUTHORIZATION_SERVER_URL": "https://login.cloud.camunda.io/oauth/token",
     "ZEEBE_TOKEN_AUDIENCE": "zeebe.camunda.io",
-    "CAMUNDA_CLUSTER_ID": "***",
-    "CAMUNDA_CLUSTER_REGION": "***",
-    "CAMUNDA_CREDENTIALS_SCOPES": "***",
+    "CAMUNDA_CLUSTER_ID": "*",
+    "CAMUNDA_CLUSTER_REGION": "*",
+    "CAMUNDA_CREDENTIALS_SCOPES": "*",
+    "CAMUNDA_TASKLIST_BASE_URL": "*",
+    "CAMUNDA_OPTIMIZE_BASE_URL": "*",
+    "CAMUNDA_OPERATE_BASE_URL": "*",
     "CAMUNDA_OAUTH_URL": "https://login.cloud.camunda.io/oauth/token"
   },
 ```
@@ -25,7 +28,7 @@ pobieramy repozytorium i z uruchamiamy komendą:
 ```
 docker-compose up -d
 ```
-Należy także przestawić flagę IsLocalConnection w pliku appsettings.json na true.
+Należy także przestawić flagę IsLocalConnection w pliku appsettings.json na true oraz ustawić CAMUNDA_OPERATE_BASE_URL na localhost:8021.
 Zabicie środowiska: 
 ```
 docker compose down -v
