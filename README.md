@@ -2,7 +2,7 @@
 Uruchamianie środowiska w chmurze/SASS:
 
 Przed uruchomieniem należy utworzyć klaster na https://console.cloud.camunda.io
-oraz dodać do API Client credentials. Pobieramy Client credentials z zakładki Env Vars i aktualizuje sekcje
+oraz dodać do API Client credentials wybierjąc wszysktie scopes. Pobieramy Client credentials z zakładki Env Vars. Aktualizujemy sekcje
 CamundaEnvironment odpowiednimi wartościami w pliku appsettings.json
 ``` 
 "CamundaEnvironment": {
