@@ -12,7 +12,7 @@ namespace Camunda.WebApi.Infrastructure.Services.ZeebeEngine;
 
 public class ZeebeClientService : IZeebeClientService, IDisposable
 {
-    private readonly CamundaEnvironmentOptions _camundaEnvironment;S
+    private readonly CamundaEnvironmentOptions _camundaEnvironment;
     private readonly CamundaOptions _camundaOptions;
 
     private readonly IZeebeClient _client;
