@@ -12,7 +12,7 @@ namespace Camunda.WebApi.Infrastructure.Services.ZeebeEngine;
 
 public class ZeebeClientService : IZeebeClientService, IDisposable
 {
-    private readonly CamundaEnvironmentOptions _camundaEnvironment;
+    private readonly CamundaEnvironmentOptions _camundaEnvironment;S
     private readonly CamundaOptions _camundaOptions;
 
     private readonly IZeebeClient _client;
@@ -52,8 +52,8 @@ public class ZeebeClientService : IZeebeClientService, IDisposable
         var deployment = await builder.Send(cancellationToken);
 
         foreach (var process in deployment.Processes)
-            _logger.LogInformation("Deployed BPMN Model: " + process!.BpmnProcessId + " v." + process!.Version +
-                                   " process name: " + process!.ResourceName);
+            _logger.LogInformation(
+                $"Deployed BPMN Model: {process!.BpmnProcessId} v.{process!.Version} process path: {process!.ResourceName}");
     }
 
     public async Task<IProcessInstanceResult> RunProcessInstance(string bpmProcessId,

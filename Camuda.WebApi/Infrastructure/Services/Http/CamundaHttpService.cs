@@ -25,7 +25,7 @@ public class CamundaHttpService : ICamundaHttpService
 
     public async Task<TResponse?> Get<TResponse>(Uri uri, CancellationToken cancellationToken)
     {
-        using var client = await PrepareClient(uri, cancellationToken);
+        using var client = await PrepareClient(cancellationToken);
 
         var response = await client.GetFromJsonAsync<TResponse>(uri, cancellationToken);
 
@@ -34,7 +34,7 @@ public class CamundaHttpService : ICamundaHttpService
 
     public async Task<TResponse?> Post<TResponse>(Uri uri, CancellationToken cancellationToken, object? payload = null)
     {
-        using var client = await PrepareClient(uri, cancellationToken);
+        using var client = await PrepareClient(cancellationToken);
 
         var response = await client.PostAsJsonAsync(uri, payload, cancellationToken);
 
@@ -44,7 +44,7 @@ public class CamundaHttpService : ICamundaHttpService
         return result;
     }
 
-    private async Task<HttpClient> PrepareClient(Uri uri, CancellationToken cancellationToken)
+    private async Task<HttpClient> PrepareClient(CancellationToken cancellationToken)
     {
         var client = _httpClientFactory.CreateClient();
 
@@ -87,25 +87,18 @@ public class CamundaHttpService : ICamundaHttpService
 
     private class Token
     {
-        private int _expiresIn;
-
         public Token(string accessToken, int expiresIn)
         {
             AccessToken = accessToken;
             ExpiresIn = expiresIn;
         }
 
-        [JsonPropertyName("access_token")] public string AccessToken { get; } = default!;
+        [JsonPropertyName("access_token")] public string AccessToken { get; }
 
         [JsonPropertyName("expires_in")]
         public int ExpiresIn
         {
-            get => _expiresIn;
-            set
-            {
-                _expiresIn = value;
-                ExpiresAt = DateTimeOffset.Now.AddSeconds(_expiresIn);
-            }
+            set => ExpiresAt = DateTimeOffset.Now.AddSeconds(value);
         }
 
         public DateTimeOffset ExpiresAt { get; private set; }
