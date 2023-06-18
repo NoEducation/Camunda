@@ -35,7 +35,7 @@ public class ProcessController : ControllerBase
     }
 
     [HttpGet("process-instance/statistic")]
-    public async Task<object?> GetProcessInstGetProcessInstanceStatisticDetails([FromQuery] string instanceKey,
+    public async Task<object?> GetProcessInstanceStatisticDetails([FromQuery] string instanceKey,
         CancellationToken cancellationToken)
     {
         return await _camoundaOperateService.GetProcessInstanceStatistic(instanceKey, cancellationToken);
